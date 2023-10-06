@@ -12,7 +12,7 @@
 
 ## Tomar en cuenta
 
-
+<!-- TODO: AGREGAR LAS NUEVAS ENTIDADES Y ATRIBUTOS -->
 # POSIBLES ATRIBUTOS DE LAS ENTIDADES
 #### ESTUDIANTE:
 - carnet Bigint (PK)
@@ -28,13 +28,13 @@
 - id_carrera int (FK)
 
 #### CARRERA:
-- id_carrera int AUTO (PK)
+- id_carrera int  (PK)
 - nombre Varchar(50)
 
 #### DOCENTE:
 - id_docente int AUTO (PK)
 - nombres Varchar(50)
-- apellidos Varchar(50)
+- apellidos Varchar(50) 
 - fecha_nacimieno Date
 - correo Varchar(50)
 - telefono Varchar(8)
@@ -76,11 +76,7 @@
 
 #### NOTA:
 - id_nota int AUTO (PK)
-- ciclo Varchar(2)
-- seccion Char(1)
 - nota int
-- id_asignacion int (FK)
-- id_curso int (FK)
 - carnet_estudiante Bigint (FK)
 
 #### ACTA:
