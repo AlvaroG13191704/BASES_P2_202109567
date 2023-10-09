@@ -86,3 +86,4 @@
 - fecha_hora datetime
 - id_asignacion int (FK)
 
+#### TRANSACCION:
