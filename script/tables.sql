@@ -98,12 +98,11 @@ CREATE TABLE IF NOT EXISTS ASIGNACION (
 
 -- HORARIO
 CREATE TABLE IF NOT EXISTS HORARIO (
-    id_horario INTEGER AUTO_INCREMENT NOT NULL,
-    dia INTEGER NOT NULL,
-    horario VARCHAR(30) NOT NULL,
-    id_curso_habilitado INTEGER NOT NULL,
-    PRIMARY KEY (id_horario),
-    FOREIGN KEY (id_curso_habilitado) REFERENCES CURSO_HABILITADO(id_curso_habilitado)
+  id_horario INTEGER AUTO_INCREMENT NOT NULL,
+  dia INTEGER NOT NULL,
+  horario VARCHAR(30) NOT NULL,
+  id_curso_habilitado INTEGER NOT NULL,
+  PRIMARY KEY (id_horario),
 );
 
 -- DETALLE_CURSO_HABILITADO
@@ -118,18 +117,18 @@ CREATE TABLE IF NOT EXISTS DETALLE_CURSO_HABILITADO (
 
 -- NOTA
 CREATE TABLE IF NOT EXISTS NOTA (
-    id_nota INTEGER AUTO_INCREMENT NOT NULL,
-    nota INTEGER NOT NULL ,
-    id_asignacion INTEGER NOT NULL,
-    PRIMARY KEY (id_nota),
-    FOREIGN KEY (id_asignacion) REFERENCES ASIGNACION(id_asignacion)
+  id_nota INTEGER AUTO_INCREMENT NOT NULL,
+  nota INTEGER NOT NULL ,
+  id_asignacion INTEGER NOT NULL,
+  PRIMARY KEY (id_nota),
+  FOREIGN KEY (id_asignacion) REFERENCES ASIGNACION(id_asignacion)
 );
 
 -- TRANSACCION
 CREATE TABLE IF NOT EXISTS TRANSACCION(
-    id_transaccion INTEGER AUTO_INCREMENT NOT NULL,
-    fecha_hora DATETIME NOT NULL,
-    descripcion VARCHAR(200) NOT NULL,
-    tipo VARCHAR(30),
-    PRIMARY KEY (id_transaccion)
+  id_transaccion INTEGER AUTO_INCREMENT NOT NULL,
+  fecha_hora DATETIME NOT NULL,
+  descripcion VARCHAR(200) NOT NULL,
+  tipo VARCHAR(30),
+  PRIMARY KEY (id_transaccion)
 );
