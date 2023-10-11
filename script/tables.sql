@@ -1,7 +1,7 @@
 -- CREATE DATABASE
 CREATE DATABASE IF NOT EXISTS proyecto2;
 USE proyecto2;
-
+DROP DATABASE proyecto2;
 SHOW TABLES FROM proyecto2;
 
 -- Create tables
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS ESTUDIANTE (
   telefono INTEGER NOT NULL,
   direccion VARCHAR(50) NOT NULL,
   dpi BIGINT NOT NULL,
-  creditos INTEGER NOT NULL,
+  creditos INTEGER ,
   registro_creacion DATE NOT NULL,
   id_carrera INTEGER NOT NULL,
   PRIMARY KEY (carnet),
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS CURSO_HABILITADO (
 -- ASIGNACION
 CREATE TABLE IF NOT EXISTS ASIGNACION (
   id_asignacion INTEGER AUTO_INCREMENT NOT NULL,
-  fecha_desasignacion DATE NOT NULL,
+  fecha_desasignacion DATE ,
   id_curso_habilitado INTEGER NOT NULL,
   carnet BIGINT NOT NULL,
   PRIMARY KEY (id_asignacion),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS HORARIO (
   dia INTEGER NOT NULL,
   horario VARCHAR(30) NOT NULL,
   id_curso_habilitado INTEGER NOT NULL,
-  PRIMARY KEY (id_horario),
+  PRIMARY KEY (id_horario)
 );
 
 -- DETALLE_CURSO_HABILITADO
@@ -112,8 +112,6 @@ CREATE TABLE IF NOT EXISTS DETALLE_CURSO_HABILITADO (
   FOREIGN KEY (id_horario) REFERENCES HORARIO(id_horario),
   FOREIGN KEY (id_curso_habilitado) REFERENCES  CURSO_HABILITADO(id_curso_habilitado)
 );
-
-
 
 -- NOTA
 CREATE TABLE IF NOT EXISTS NOTA (
