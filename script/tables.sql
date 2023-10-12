@@ -1,9 +1,3 @@
--- CREATE DATABASE
-CREATE DATABASE IF NOT EXISTS proyecto2;
-USE proyecto2;
-DROP DATABASE proyecto2;
-SHOW TABLES FROM proyecto2;
-
 -- Create tables
 -- CARRERA
 CREATE TABLE IF NOT EXISTS CARRERA (
@@ -19,9 +13,9 @@ CREATE TABLE IF NOT EXISTS ESTUDIANTE (
   apellidos VARCHAR(50) NOT NULL,
   fecha_nacimiento DATE NOT NULL,
   correo VARCHAR(50) NOT NULL,
-  telefono INTEGER NOT NULL,
+  telefono INT(8) NOT NULL,
   direccion VARCHAR(50) NOT NULL,
-  dpi BIGINT NOT NULL,
+  dpi BIGINT(13) NOT NULL,
   creditos INTEGER ,
   registro_creacion DATE NOT NULL,
   id_carrera INTEGER NOT NULL,
@@ -36,9 +30,9 @@ CREATE TABLE IF NOT EXISTS DOCENTE (
     apellidos VARCHAR(50) NOT NULL,
     fecha_nacimiento DATE NOT NULL,
     correo VARCHAR(50) NOT NULL,
-    telefono INTEGER NOT NULL,
+    telefono INT(8) NOT NULL,
     direccion VARCHAR(100) NOT NULL,
-    dpi BIGINT NOT NULL,
+    dpi BIGINT(13) NOT NULL,
     registro_siif INTEGER NOT NULL,
     registro_creacion DATE NOT NULL ,
     PRIMARY KEY (id_docente)
@@ -47,10 +41,11 @@ CREATE TABLE IF NOT EXISTS DOCENTE (
 -- CURSO
 CREATE TABLE IF NOT EXISTS CURSO (
   id_curso INTEGER AUTO_INCREMENT NOT NULL,
-  codigo INTEGER NOT NULL,
+  codigo INT NOT NULL,
   nombre VARCHAR(50) NOT NULL,
   creditos_necesarios INTEGER NOT NULL,
   creditos_obligatorios INTEGER NOT NULL,
+  obligatorio BOOLEAN NOT NULL,
   id_carrera INTEGER NOT NULL,
   PRIMARY KEY (id_curso),
   FOREIGN KEY (id_carrera) REFERENCES CARRERA(id_carrera)

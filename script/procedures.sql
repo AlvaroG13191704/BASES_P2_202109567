@@ -50,7 +50,7 @@ CREATE PROCEDURE registrarEstudiante(
         SET new_id_carrera = GetCareer(newCarrera);
 
         -- get current date
-        SET currentDate = Get_Date();
+        SET currentDate = GetDate();
 
         -- Validate
         IF is_email_valid = FALSE THEN
@@ -72,6 +72,88 @@ CREATE PROCEDURE registrarEstudiante(
                         currentDate,
                         new_id_carrera
                        );
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 3.
+DELIMITER $$
+CREATE PROCEDURE registrarDocente(
+    IN newNames VARCHAR(50),
+    IN newLastName VARCHAR(50),
+    IN newBirthDay DATE,
+    IN newEmail VARCHAR(50),
+    IN newPhone INTEGER,
+    IN newAddress VARCHAR(50),
+    IN newDpi BIGINT,
+    IN newSIIF BIGINT
+)
+    BEGIN
+        DECLARE is_email_valid BOOLEAN;
+        DECLARE currentDate DATETIME;
+        DECLARE is_new_docente BOOLEAN;
+        -- evaluate if the docente is already created
+        SET is_new_docente = IsNewDocente(newDpi);
+        IF is_new_docente = TRUE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El docente ya existe en la base de datos.';
+        END IF;
+
+        -- Evaluate if the email is valid
+        SET is_email_valid = IsEmailValid(newEmail);
+
+        -- get current date
+        SET currentDate = GetDate();
+
+        -- Validate
+        IF is_email_valid = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El email no es valido.';
+        ELSE
+            -- save
+            INSERT INTO DOCENTE(
+                nombres, apellidos, fecha_nacimiento, correo, telefono, direccion, dpi, registro_siif, registro_creacion
+                )  VALUES(
+                newNames,newLastName,newBirthDay,newEmail,newPhone,newAddress,newDpi,newSIIF,currentDate
+                );
+        END IF;
+    END;
+    $$
+DELIMITER ;
+-- 4.
+DELIMITER $$
+CREATE PROCEDURE crearCurso(
+    IN newCode INT,
+    IN newName VARCHAR(50),
+    IN newNecesarryCredits INTEGER,
+    IN newGiveCredtis INTEGER,
+    IN newMandatory BOOLEAN,
+    IN newCarrera INTEGER
+)
+    BEGIN
+        DECLARE positiveInteger1 BOOLEAN;
+        DECLARE positiveInteger2 BOOLEAN;
+        DECLARE new_id_carrera INTEGER;
+
+        -- Get the id from "CARRERA" table
+        SET new_id_carrera = GetCareer(newCarrera);
+
+        -- Evaluate if credits are valid
+        SET positiveInteger1 = IsPositiveIntegerOrZero(newNecesarryCredits);
+        SET positiveInteger2 = IsPositiveIntegerOrZero(newGiveCredtis);
+
+        IF positiveInteger1 = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Creditos necesarios no es un número positivo.';
+        ELSEIF positiveInteger2 = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Creditos otorgads no es un número positivo.';
+        ELSEIF new_id_carrera IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La carrera no existe.';
+        ELSE
+            -- insert table
+            INSERT INTO CURSO(
+                codigo, nombre, creditos_necesarios, creditos_obligatorios, obligatorio, id_carrera
+                ) VALUES (
+                          newCode, newName, newNecesarryCredits, newGiveCredtis,newMandatory,new_id_carrera
+               );
         END IF;
     END;
     $$

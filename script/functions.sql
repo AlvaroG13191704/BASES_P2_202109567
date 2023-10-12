@@ -1,6 +1,42 @@
 -- FUNCTIONS
+-- validate if it's a positive integer or cero
+DELIMITER $$
+CREATE FUNCTION IsPositiveIntegerOrZero(value INTEGER)
+    RETURNS BOOLEAN
+    DETERMINISTIC
+BEGIN
+    DECLARE is_valid BOOLEAN;
+    SET is_valid = FALSE;
+
+    IF value >= 0 AND value = FLOOR(value) THEN
+        SET is_valid = TRUE;
+    END IF;
+
+    RETURN is_valid;
+END;
+$$
+DELIMITER ;
+
+-- validate if the docente is already created
+DELIMITER $$
+CREATE FUNCTION IsNewDocente(inputDPI BIGINT(13))
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+    BEGIN
+        DECLARE already_exist BOOLEAN;
+        SET already_exist = FALSE;
+
+        -- Use COUNT(*) to check for existence
+        SELECT COUNT(*) INTO already_exist FROM DOCENTE WHERE dpi = inputDPI;
+
+        RETURN already_exist;
+    END
+$$
+DELIMITER ;
+
 
 -- Validate if a string only contain letters
+DROP FUNCTION proyecto2.ValidateOnlyLetters;
 DELIMITER $$
 CREATE FUNCTION ValidateOnlyLetters(name VARCHAR(100))
     RETURNS BOOLEAN READS SQL DATA
@@ -8,7 +44,7 @@ CREATE FUNCTION ValidateOnlyLetters(name VARCHAR(100))
     BEGIN
         DECLARE valid BOOLEAN;
         SET valid = TRUE;
-        IF name REGEXP '^[a-zA-Z ]+$' THEN
+        IF name REGEXP '^[a-zA-Zaáéíóú ]*$' THEN
             SET valid = TRUE;
         ELSE
             SET valid = FALSE;
@@ -18,7 +54,7 @@ CREATE FUNCTION ValidateOnlyLetters(name VARCHAR(100))
     END $$
 DELIMITER ;
 
-DROP FUNCTION proyecto2.GetCareer;
+-- DROP FUNCTION proyecto2.GetCareer;
 -- Function to get the "CARRERA" id
 DELIMITER $$
 CREATE FUNCTION GetCareer(inputId INTEGER)
@@ -52,13 +88,20 @@ DELIMITER ;
 
 -- Function to return the current date
 DELIMITER $$
-CREATE FUNCTION Get_Date()
-RETURNS DATETIME READS SQL DATA
-NOT DETERMINISTIC
+CREATE FUNCTION GetDate()
+    RETURNS DATE READS SQL DATA
 BEGIN
-    DECLARE fecha_hora DATETIME;
-    SET fecha_hora = NOW();
-    RETURN fecha_hora;
+    RETURN CURDATE();
+END;
+$$
+DELIMITER ;
+
+-- Function to return the current datetime
+DELIMITER $$
+CREATE FUNCTION GetDateTime()
+    RETURNS DATETIME READS SQL DATA
+BEGIN
+    RETURN CURDATE();
 END;
 $$
 DELIMITER ;
