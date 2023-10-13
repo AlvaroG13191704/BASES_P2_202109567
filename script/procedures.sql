@@ -1,5 +1,3 @@
--- PROCEDURES
-
 -- 1.
 DELIMITER $$
 CREATE PROCEDURE crearCarrera(IN inputName VARCHAR(50))
@@ -154,6 +152,82 @@ CREATE PROCEDURE crearCurso(
                 ) VALUES (
                           newCode, newName, newNecesarryCredits, newGiveCredtis,newMandatory,new_id_carrera
                );
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 5.
+DELIMITER $$
+CREATE PROCEDURE habilitarCurso(
+    IN newCodeCurso INT,
+    IN newCicle VARCHAR(2),
+    IN newDocente INTEGER,
+    IN newMaxCupo INTEGER,
+    IN newSeccion CHAR(1)
+)
+    BEGIN
+        DECLARE valid_max_cupo BOOLEAN;
+        DECLARE curso_id INTEGER;
+        DECLARE ciclo_id INTEGER;
+        DECLARE docente_id INTEGER;
+        DECLARE seccion_id INTEGER;
+        DECLARE dateCreation DATE;
+
+        -- set values
+        SET curso_id = GetCurso(newCodeCurso);
+        SET ciclo_id = GetCiclo(newCicle);
+        SET docente_id = GetDocente(newDocente);
+        SET valid_max_cupo = IsPositiveIntegerOrZero(newMaxCupo);
+        SET seccion_id = GetOrInsertSeccion(UPPER(newSeccion));
+        SET dateCreation = GetDate();
+
+        -- add if's
+        IF curso_id IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El curso no existe';
+        ELSEIF ciclo_id IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL ciclo ingresado no existe';
+        ELSEIF  docente_id IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL docente no existe';
+        ELSEIF valid_max_cupo = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL cupo máximo no es un entero positivo';
+        ELSE
+            -- insert
+            INSERT INTO CURSO_HABILITADO (cupo_maximo, cantidad_asignados, fecha, id_curso, id_docente, id_ciclo, id_seccion)
+                VALUES (
+                newMaxCupo,0,dateCreation,curso_id,docente_id,ciclo_id,seccion_id
+                );
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 6.
+DELIMITER $$
+CREATE PROCEDURE agregarHorario(
+    IN new_id_curso_habilitado INTEGER,
+    IN new_day INTEGER,
+    in new_schedule VARCHAR(30)
+)
+    BEGIN
+        -- declare
+        DECLARE is_valid_day BOOLEAN;
+        DECLARE curso_habilitado_id INTEGER;
+        DECLARE horario_id INTEGER;
+        -- set
+        SET curso_habilitado_id = GetCursoHabilitado(new_id_curso_habilitado);
+        set is_valid_day = IsDayInRange(new_day);
+        -- validate
+        IF curso_habilitado_id IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El curso habilitado no existe.';
+        ELSEIF is_valid_day = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El día esta fuera de rango.';
+        ELSE
+            -- Insert horario
+            SET horario_id = InsertHorario(new_day,new_schedule);
+            -- insert in "DETALLE HORARIO"
+            INSERT INTO DETALLE_CURSO_HABILITADO (id_horario, id_curso_habilitado)
+                VALUES (horario_id, curso_habilitado_id );
         END IF;
     END;
     $$

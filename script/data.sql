@@ -1,5 +1,13 @@
 
 
+-- charge ciclos
+INSERT INTO CICLO(nombre) VALUES('1S');
+INSERT INTO CICLO(nombre) VALUES('2S');
+INSERT INTO CICLO(nombre) VALUES('VJ');
+INSERT INTO CICLO(nombre) VALUES('VD');
+
+SELECT * FROM CICLO;
+
 -- crearCarrera
 CALL crearCarrera('Área Común');
 CALL crearCarrera('Ingenieria en Ciencias y Sistemas');
@@ -44,3 +52,14 @@ CALL crearCurso(0772,'Estructura de datos',90,6,1,1);
 CALL crearCurso(0777,'Compiladores 1',90,6,1,1);
 
 SELECT * FROM CURSO;
+
+-- habilitarCurso
+CALL habilitarCurso(0107, '1S', 200200001, 100, 'A');
+
+SELECT * FROM CURSO_HABILITADO;
+
+-- agregarHorario
+CALL agregarHorario(1, 2, '9:00-10:40');
+
+SELECT * FROM HORARIO;
+SELECT * FROM DETALLE_CURSO_HABILITADO;
