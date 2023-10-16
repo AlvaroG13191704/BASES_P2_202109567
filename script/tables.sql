@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS CURSO (
   codigo INT NOT NULL,
   nombre VARCHAR(50) NOT NULL,
   creditos_necesarios INTEGER NOT NULL,
-  creditos_obligatorios INTEGER NOT NULL,
+  creditos_otorgados INTEGER NOT NULL,
   obligatorio BOOLEAN NOT NULL,
   id_carrera INTEGER NOT NULL,
   PRIMARY KEY (id_curso),
@@ -68,7 +68,6 @@ CREATE TABLE IF NOT EXISTS SECCION (
 CREATE TABLE IF NOT EXISTS CURSO_HABILITADO (
   id_curso_habilitado INTEGER NOT NULL AUTO_INCREMENT,
   cupo_maximo INTEGER NOT NULL,
-  cantidad_asignados INTEGER NOT NULL,
   fecha DATE NOT NULL,
   id_curso INTEGER NOT NULL,
   id_docente INTEGER NOT NULL,
@@ -116,6 +115,15 @@ CREATE TABLE IF NOT EXISTS NOTA (
   id_asignacion INTEGER NOT NULL,
   PRIMARY KEY (id_nota),
   FOREIGN KEY (id_asignacion) REFERENCES ASIGNACION(id_asignacion)
+);
+
+-- ACTA
+CREATE TABLE IF NOT EXISTS ACTA (
+  id_acta INTEGER AUTO_INCREMENT NOT NULL,
+  fecha_hora DATETIME NOT NULL,
+  id_curso_habilitado INTEGER NOT NULL,
+  PRIMARY KEY (id_acta),
+  FOREIGN KEY (id_curso_habilitado) REFERENCES CURSO_HABILITADO(id_curso_habilitado)
 );
 
 -- TRANSACCION

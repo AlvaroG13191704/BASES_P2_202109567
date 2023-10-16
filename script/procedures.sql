@@ -117,7 +117,9 @@ CREATE PROCEDURE registrarDocente(
     END;
     $$
 DELIMITER ;
+
 -- 4.
+DROP PROCEDURE proyecto2.crearCurso;
 DELIMITER $$
 CREATE PROCEDURE crearCurso(
     IN newCode INT,
@@ -148,7 +150,7 @@ CREATE PROCEDURE crearCurso(
         ELSE
             -- insert table
             INSERT INTO CURSO(
-                codigo, nombre, creditos_necesarios, creditos_obligatorios, obligatorio, id_carrera
+                codigo, nombre, creditos_necesarios, creditos_otorgados, obligatorio, id_carrera
                 ) VALUES (
                           newCode, newName, newNecesarryCredits, newGiveCredtis,newMandatory,new_id_carrera
                );
@@ -228,6 +230,208 @@ CREATE PROCEDURE agregarHorario(
             -- insert in "DETALLE HORARIO"
             INSERT INTO DETALLE_CURSO_HABILITADO (id_horario, id_curso_habilitado)
                 VALUES (horario_id, curso_habilitado_id );
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 7.
+DROP PROCEDURE proyecto2.asignarCurso;
+DELIMITER $$
+CREATE PROCEDURE asignarCurso(
+    IN new_id_curso INT,
+    IN new_ciclo VARCHAR(2),
+    IN new_seccion CHAR(1),
+    IN new_carnet BIGINT
+)
+    BEGIN
+        -- Declaration
+        DECLARE curso_habilitado_id INTEGER;
+        DECLARE ciclo_id INTEGER;
+        DECLARE seccion_id INTEGER;
+        DECLARE carnet_id BIGINT;
+        DECLARE is_already_assign BOOLEAN;
+        DECLARE is_same_carrera BOOLEAN;
+        DECLARE has_necesary_credits BOOLEAN;
+        DECLARE is_cupo_max BOOLEAN;
+        -- Setters
+        SET seccion_id = GetSeccion(UPPER(new_seccion));
+        SET ciclo_id = GetCiclo(new_ciclo);
+        SET curso_habilitado_id = GetCursoHabilitadoByCode(new_id_curso,ciclo_id,seccion_id);
+        SET carnet_id = GetEstudiante(new_carnet);
+        SET is_already_assign = IsAsignado(new_carnet,curso_habilitado_id);
+        SET is_same_carrera = IsSameCarrera(new_carnet,curso_habilitado_id);
+        SET has_necesary_credits = HasNecesaryCredits(new_carnet,curso_habilitado_id);
+        SET is_cupo_max = IsCupoAvailable(curso_habilitado_id);
+
+        -- evaluate all
+        IF seccion_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La seccion no existe';
+        ELSEIF ciclo_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El ciclo no existe';
+        ELSEIF curso_habilitado_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este curso no esta habilitado';
+        ELSEIF carnet_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este caret no pertenece a ningun estudiante';
+        ELSEIF is_already_assign = TRUE THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El estudiante ya esta asignado';
+        ELSEIF is_same_carrera = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El estudiante no pertenece a la carrera de este curso';
+        ELSEIF has_necesary_credits = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El estudiante no cuenta con los creditos necesarios';
+        ELSEIF is_cupo_max = TRUE THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El curso se quedo sin cupo';
+        ELSE
+            -- Assignn
+            INSERT INTO ASIGNACION (fecha_desasignacion, id_curso_habilitado, carnet)
+                VALUES (NULL, curso_habilitado_id, carnet_id);
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 8.
+DROP PROCEDURE proyecto2.desasignarCurso;
+DELIMITER $$
+CREATE PROCEDURE desasignarCurso(
+    IN new_id_curso INT,
+    IN new_ciclo VARCHAR(2),
+    IN new_seccion CHAR(1),
+    IN new_carnet BIGINT
+)
+    BEGIN
+        -- Declaration
+        DECLARE curso_habilitado_id INTEGER;
+        DECLARE ciclo_id INTEGER;
+        DECLARE seccion_id INTEGER;
+        DECLARE carnet_id BIGINT;
+        DECLARE is_already_assign BOOLEAN;
+        -- Setters
+        SET seccion_id = GetSeccion(UPPER(new_seccion));
+        SET ciclo_id = GetCiclo(new_ciclo);
+        SET curso_habilitado_id = GetCursoHabilitadoByCode(new_id_curso,ciclo_id,seccion_id);
+        SET carnet_id = GetEstudiante(new_carnet);
+        SET is_already_assign = IsAsignado(new_carnet,curso_habilitado_id);
+
+        -- evaluate all
+        IF seccion_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La seccion no existe';
+        ELSEIF ciclo_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El ciclo no existe';
+        ELSEIF curso_habilitado_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este curso no esta habilitado';
+        ELSEIF carnet_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este caret no pertenece a ningun estudiante';
+        ELSEIF is_already_assign = TRUE THEN
+            -- Find the user with the id_curso and carnet
+            UPDATE ASIGNACION
+            SET fecha_desasignacion = GetDateTime()
+                WHERE id_curso_habilitado = curso_habilitado_id AND carnet = carnet_id;
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- 9.
+DROP PROCEDURE proyecto2.ingresarNota;
+DELIMITER $$
+CREATE PROCEDURE ingresarNota(
+    IN new_id_curso INT,
+    IN new_ciclo VARCHAR(2),
+    IN new_seccion CHAR(1),
+    IN new_carnet BIGINT,
+    IN new_note FLOAT
+)
+    BEGIN
+        -- Declaration
+        DECLARE student_credits INTEGER;
+        DECLARE curso_credits INTEGER;
+        DECLARE curso_habilitado_id INTEGER;
+        DECLARE ciclo_id INTEGER;
+        DECLARE seccion_id INTEGER;
+        DECLARE carnet_id BIGINT;
+        DECLARE asignacion_id INTEGER;
+        DECLARE is_positive_number BOOLEAN;
+        DECLARE still_asignado BOOLEAN;
+        DECLARE final_note INTEGER;
+        -- Setters
+        SET seccion_id = GetSeccion(UPPER(new_seccion));
+        SET ciclo_id = GetCiclo(new_ciclo);
+        SET curso_habilitado_id = GetCursoHabilitadoByCode(new_id_curso,ciclo_id,seccion_id);
+        SET carnet_id = GetEstudiante(new_carnet);
+        SET is_positive_number = IsPositiveIntegerOrZero(new_note);
+        SET final_note = RoundedNote(new_note);
+        SET asignacion_id = GetAsignacion(curso_habilitado_id,carnet_id);
+        -- set some values
+        SELECT creditos_otorgados INTO curso_credits FROM CURSO WHERE codigo = new_id_curso;
+        SELECT creditos INTO student_credits FROM ESTUDIANTE WHERE carnet = carnet_id;
+        SELECT 1 INTO still_asignado FROM ASIGNACION WHERE id_asignacion = asignacion_id AND fecha_desasignacion IS NULL;
+        -- evaluate all
+        IF seccion_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La seccion no existe';
+        ELSEIF ciclo_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El ciclo no existe';
+        ELSEIF curso_habilitado_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este curso no esta habilitado';
+        ELSEIF carnet_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este carnet no pertenece a ningun estudiante';
+        ELSEIF is_positive_number = FALSE THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La nota ingresada no es un entero positivo';
+        ELSEIF asignacion_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL estudiante no esta asignado a este curso';
+        ELSEIF still_asignado IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL estudiante se ha desasignado este curso';
+        ELSE
+            -- add nota
+            INSERT INTO NOTA(nota, id_asignacion) VALUES(final_note,asignacion_id);
+            -- update credits
+            IF final_note >= 61 THEN
+                UPDATE  ESTUDIANTE
+                    SET creditos = student_credits + curso_credits
+                WHERE carnet = carnet_id;
+            END IF;
+        END IF;
+    END;
+    $$
+DELIMITER ;
+
+-- Function to verify if all the students of that curso have a note
+
+
+
+-- 10.
+DROP PROCEDURE proyecto2.generarActa;
+DELIMITER $$
+CREATE PROCEDURE generarActa(
+    IN new_id_curso INT,
+    IN new_ciclo VARCHAR(2),
+    IN new_seccion CHAR(1)
+)
+    BEGIN
+        -- Declaration
+        DECLARE curso_habilitado_id INTEGER;
+        DECLARE ciclo_id INTEGER;
+        DECLARE seccion_id INTEGER;
+        DECLARE is_complete BOOLEAN;
+        -- Setters
+        SET seccion_id = GetSeccion(UPPER(new_seccion));
+        SET ciclo_id = GetCiclo(new_ciclo);
+        SET curso_habilitado_id = GetCursoHabilitadoByCode(new_id_curso,ciclo_id,seccion_id);
+        SET is_complete = AreNotasComplete(curso_habilitado_id);
+
+        -- evaluate all
+        IF seccion_id IS NULL THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La seccion no existe';
+        ELSEIF ciclo_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El ciclo no existe';
+        ELSEIF curso_habilitado_id IS NULL THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Este curso no esta habilitado';
+        ELSEIF is_complete = FALSE THEN
+               SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Las notas no estan completas';
+        ELSE
+            -- Insert acta
+            INSERT INTO ACTA(fecha_hora, id_curso_habilitado) VALUES (GetDateTime(),curso_habilitado_id);
+
         END IF;
     END;
     $$

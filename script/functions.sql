@@ -209,3 +209,228 @@ BEGIN
 END;
 $$
 DELIMITER ;
+
+-- Function to validate if the
+DELIMITER $$
+CREATE FUNCTION IsCupoAvailable(input_curso_habilitado_id INT)
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE cupo_max_reached BOOLEAN;
+    SET cupo_max_reached = FALSE;
+
+    -- Count the total assignments for the curso_habilitado
+    SELECT COUNT(*) INTO cupo_max_reached
+    FROM ASIGNACION a
+    WHERE a.id_curso_habilitado = input_curso_habilitado_id;
+
+    -- Compare the count to cupo_maximo
+    IF cupo_max_reached >= (SELECT cupo_maximo FROM CURSO_HABILITADO WHERE id_curso_habilitado = input_curso_habilitado_id) THEN
+        SET cupo_max_reached = TRUE;
+    ELSE
+        SET cupo_max_reached = FALSE;
+    END IF;
+
+    RETURN cupo_max_reached;
+END;
+$$
+DELIMITER ;
+
+-- Function to validate if the student owns for tha carreer
+DROP FUNCTION proyecto2.IsSameCarrera;
+DELIMITER $$
+CREATE FUNCTION IsSameCarrera(inputCarnet BIGINT, input_curso_h INTEGER)
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE is_same_carrera BOOLEAN;
+    SET is_same_carrera = FALSE;
+
+    -- Check if the assignment exists for the given carnet and course_id
+    SELECT 1 INTO is_same_carrera
+    FROM CURSO_HABILITADO CH
+    JOIN CURSO C ON CH.id_curso = C.id_curso
+    JOIN ESTUDIANTE E ON E.carnet = inputCarnet
+    WHERE (C.id_carrera = E.id_carrera OR C.id_carrera = 1)
+    AND CH.id_curso_habilitado = input_curso_h
+    LIMIT 1;
+    -- If is the same carrera or area comun, return true
+    IF is_same_carrera THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END;
+$$
+DELIMITER ;
+
+-- Function to validate if the student is already assign
+-- DROP FUNCTION proyecto2.IsAsignado;
+DELIMITER $$
+CREATE FUNCTION IsAsignado(inputCaret BIGINT, input_curso_h INTEGER)
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE assignment_exists BOOLEAN;
+    SET assignment_exists = FALSE;
+
+    -- Check if the assignment exists for the given carnet and course_id
+    SELECT 1 INTO assignment_exists
+    FROM ASIGNACION
+    WHERE inputCaret = carnet AND id_curso_habilitado = input_curso_h
+    LIMIT 1;
+    -- If assignment exists, return TRUE; otherwise, return FALSE
+    IF assignment_exists THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END;
+$$
+DELIMITER ;
+
+-- Function to get  carnet from "ESTUDIANTE"
+DELIMITER $$
+CREATE FUNCTION GetEstudiante(inputCarnet BIGINT)
+    RETURNS BIGINT READS SQL DATA
+    DETERMINISTIC
+    BEGIN
+        DECLARE carnet_id INTEGER;
+        -- check if the section exits
+        SELECT carnet INTO carnet_id FROM ESTUDIANTE WHERE carnet = inputCarnet;
+        -- return the id
+        RETURN carnet_id;
+    END;
+    $$
+DELIMITER ;
+-- Function to get  section in "SECCION"
+DELIMITER $$
+CREATE FUNCTION GetSeccion(inputSeccion CHAR(1))
+    RETURNS INTEGER READS SQL DATA
+    DETERMINISTIC
+    BEGIN
+        DECLARE seccion_id INTEGER;
+        -- check if the section exits
+        SELECT id_seccion INTO seccion_id FROM SECCION WHERE seccion = inputSeccion;
+        -- return the id
+        RETURN seccion_id;
+    END;
+    $$
+DELIMITER ;
+
+-- Function to get the id from "CURSO_HABILITADO"
+-- DROP FUNCTION proyecto2.GetCursoHabilitadoByCode;
+DELIMITER $$
+CREATE FUNCTION GetCursoHabilitadoByCode(inputCode INT, input_id_ciclo INTEGER, input_id_seccion INTEGER)
+    RETURNS INT READS SQL DATA
+    DETERMINISTIC
+    BEGIN
+        DECLARE curso_h_id INTEGER;
+        -- check if the section exits
+        SELECT CH.id_curso_habilitado INTO curso_h_id
+        FROM CURSO_HABILITADO CH
+        JOIN CURSO C
+        ON CH.id_curso = C.id_curso
+        WHERE C.codigo = inputCode AND (CH.id_ciclo = input_id_ciclo AND CH.id_seccion = input_id_seccion);
+
+        RETURN curso_h_id;
+    END;
+    $$
+DELIMITER ;
+
+-- Function to validate if the user has the necesary credits
+DELIMITER $$
+CREATE FUNCTION HasNecesaryCredits(inputCarnet BIGINT, input_curso_h INTEGER)
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE necesary_credits BOOLEAN;
+    SET necesary_credits = FALSE;
+
+    -- Check if the assignment exists for the given carnet and course_id
+    SELECT 1 INTO necesary_credits
+    FROM CURSO_HABILITADO CH
+    JOIN CURSO C ON CH.id_curso = C.id_curso
+    JOIN ESTUDIANTE E ON E.carnet = inputCarnet
+    WHERE E.creditos >= C.creditos_necesarios
+    AND CH.id_curso_habilitado = input_curso_h
+    LIMIT 1;
+    -- If is the same carrera or area comun, return true
+    IF necesary_credits THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END;
+$$
+DELIMITER ;
+
+
+-- Function to return a float rounded
+DELIMITER $$
+CREATE FUNCTION RoundedNote(inputNote FLOAT)
+    RETURNS INT READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE new_value INT;
+
+    SET new_value = ROUND(inputNote);
+
+    RETURN new_value;
+END;
+$$
+DELIMITER ;
+
+
+-- Function to get the asignacion
+DELIMITER $$
+CREATE FUNCTION GetAsignacion(input_id_curso_h INTEGER, input_carnet BIGINT)
+    RETURNS INTEGER READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE asignacion_id INTEGER;
+
+    SELECT id_asignacion INTO asignacion_id FROM ASIGNACION WHERE id_curso_habilitado = input_id_curso_h AND carnet = input_carnet;
+
+    RETURN asignacion_id;
+END;
+$$
+DELIMITER ;
+
+
+
+
+-- Function to validate if all the notes
+DROP FUNCTION proyecto2.AreNotasComplete;
+
+DELIMITER $$
+CREATE FUNCTION AreNotasComplete(input_curso_habilitado_id INTEGER)
+    RETURNS BOOLEAN READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE is_complete BOOLEAN ;
+    DECLARE nota_count INT;
+    DECLARE assignment_count INT;
+    SET is_complete = FALSE;
+
+
+    -- Get the count of NOTA records for the given id_asignacion
+    SELECT COUNT(*) INTO nota_count
+        FROM NOTA N
+        JOIN ASIGNACION A ON N.id_asignacion = A.id_asignacion
+        WHERE A.id_curso_habilitado = input_curso_habilitado_id;
+
+    -- Get the count of assignments for the associated id_curso_habilitado
+    SELECT COUNT(*) INTO assignment_count
+        FROM ASIGNACION
+            WHERE id_curso_habilitado = input_curso_habilitado_id AND fecha_desasignacion IS NULL;
+
+    -- Compare the counts
+    IF nota_count = assignment_count THEN
+        SET is_complete = TRUE;
+    END IF;
+
+    RETURN is_complete;
+END;
+$$
+DELIMITER ;
