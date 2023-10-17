@@ -1,5 +1,15 @@
 
 
+-- FUNCTIONS
+
+-- TRIGGERS
+
+-- PROCEDURES
+
+
+-- TEST
+
+
 -- charge ciclos
 INSERT INTO CICLO(nombre) VALUES('1S');
 INSERT INTO CICLO(nombre) VALUES('2S');
@@ -17,7 +27,7 @@ CALL crearCarrera('Ingenieria Mecánica');
 
 SELECT * FROM CARRERA;
 
--- registrarEstudiante								
+-- registrarEstudiante
 CALL registrarEstudiante(202109567,'Alvaro Norberto','García Meza','2003-02-01','ga1318garcia@gmail.com',40584065,'Zona 2 de Bocal del Monte',3046971840116,1);
 CALL registrarEstudiante(202110568,'Damián Ignacio','Peña Afre','2003-03-22','floppagato@gmail.com',22322212,'Cenma Villa Nueva',3046201440136,2);
 CALL registrarEstudiante(202112145,'Daniel Estuardo','Cuque Ruíz','2003-10-08','cuquedaniel@gmail.com',23024843,'Carretera El Salvador',3046201440136,3);
@@ -74,7 +84,7 @@ CALL crearCurso(505, 'Proyectos de Ingeniería Mecánica', 12, 10, 1, 4);
 
 SELECT * FROM CURSO;
 
---------------------------- habilitarCurso ---------------------------
+
 -- Habilitación de Cursos de Área Común
 CALL habilitarCurso(101, '1S', 200200001, 75, 'A');
 CALL habilitarCurso(102, '1S', 200200002, 50, 'B');
@@ -272,13 +282,13 @@ SELECT * FROM ASIGNACION;
 
 -- ingresarNota
 -- Estudiante 202109567 (Alvaro) - Carrera: Civil (código 1)
-CALL ingresarNota(101, '1S', 'A', 202109567,72.3);
+-- CALL ingresarNota(101, '1S', 'A', 202109567,72.3);
 CALL ingresarNota(102, '1S', 'B', 202109567,60.7);
 CALL ingresarNota(201, '1S', 'A', 202109567,86.2);
 CALL ingresarNota(202, '1S', 'C', 202109567,95.1);
 
 -- Estudiante 202100239 (Aida) - Carrera: Mecanica (código 2)
-CALL ingresarNota(101, '1S', 'A', 202100239,20);
+-- CALL ingresarNota(101, '1S', 'A', 202100239,20);
 CALL ingresarNota(102, '1S', 'B', 202100239,59.1);
 CALL ingresarNota(501, '1S', 'L', 202100239,82);
 CALL ingresarNota(502, '1S', 'N', 202100239,75.3);
@@ -290,13 +300,13 @@ CALL ingresarNota(201, '1S', 'A', 202110897,61.7);
 CALL ingresarNota(202, '1S', 'C', 202110897,59.9);
 
 -- Estudiante 202110568 (Damian) - Carrera: Mecanica Industrial (código 2)
-CALL ingresarNota(101, '1S', 'A', 202110568,98);
+-- CALL ingresarNota(101, '1S', 'A', 202110568,98);
 CALL ingresarNota(102, '1S', 'B', 202110568,89);
 CALL ingresarNota(301, '1S', 'E', 202110568,65);
 CALL ingresarNota(302, '1S', 'A', 202110568,76);
 
 -- Estudiante 202112145 (Daniel) - Carrera: Sistemas (código 3)
-CALL ingresarNota(101, '1S', 'A', 202112145,96);
+-- CALL ingresarNota(101, '1S', 'A', 202112145,96);
 CALL ingresarNota(102, '1S', 'B', 202112145,96);
 CALL ingresarNota(401, '1S', 'C', 202112145,60);
 CALL ingresarNota(402, '1S', 'E', 202112145,61);
@@ -314,7 +324,7 @@ CALL ingresarNota(401, '1S', 'C', 202000549,69.23);
 CALL ingresarNota(402, '1S', 'E', 202000549,97);
 
 -- Estudiante 202309421 (Julissa) - Carrera: Mecanica Industrial (código 2)
-CALL ingresarNota(101, '1S', 'A', 202309421,87.5);
+-- CALL ingresarNota(101, '1S', 'A', 202309421,87.5);
 CALL ingresarNota(102, '1S', 'B', 202309421,67.5);
 CALL ingresarNota(301, '1S', 'E', 202309421,86.3);
 CALL ingresarNota(302, '1S', 'A', 202309421,93.3);
@@ -332,8 +342,7 @@ CALL ingresarNota(401, '1S', 'C', 201901803,30);
 CALL ingresarNota(402, '1S', 'E', 201901803,100);
 
 
-
--- generarActa
+-- generar acta
 CALL generarActa(101, '1S', 'A');
 CALL generarActa(102, '1S', 'B');
 CALL generarActa(201, '1S', 'A');
@@ -344,5 +353,3 @@ CALL generarActa(401, '1S', 'C');
 CALL generarActa(402, '1S', 'E');
 CALL generarActa(501, '1S', 'L');
 CALL generarActa(502, '1S', 'N');
-
-SELECT * FROM ACTA;

@@ -434,3 +434,15 @@ BEGIN
 END;
 $$
 DELIMITER ;
+
+-- Function to insert transaccion
+DELIMITER $$
+CREATE PROCEDURE InsertTransaccion(
+    IN new_description VARCHAR(200),
+    IN new_tipo VARCHAR(30)
+)
+    BEGIN
+        INSERT INTO TRANSACCION(fecha_hora, descripcion, tipo) VALUES (NOW(), new_description, new_tipo);
+    END;
+    $$
+DELIMITER ;
