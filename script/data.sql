@@ -1,15 +1,4 @@
 
-
--- FUNCTIONS
-
--- TRIGGERS
-
--- PROCEDURES
-
-
--- TEST
-
-
 -- charge ciclos
 INSERT INTO CICLO(nombre) VALUES('1S');
 INSERT INTO CICLO(nombre) VALUES('2S');
@@ -353,3 +342,13 @@ CALL generarActa(401, '1S', 'C');
 CALL generarActa(402, '1S', 'E');
 CALL generarActa(501, '1S', 'L');
 CALL generarActa(502, '1S', 'N');
+
+
+-- queries
+CALL consultarPensum(4);
+CALL consultarEstudiante(201901803);
+CALL consultarDocente(200200001);
+CALL consultarAsignados(102, '1S', 2023, 'B');
+CALL consultarAprobacion(102, '1S', 2023, 'B');
+CALL consultarActas(101);
+CALL consultarDesasignacion(101, '1S', 2023, 'A');

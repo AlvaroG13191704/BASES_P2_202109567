@@ -69,6 +69,33 @@ DELIMITER ;
 
 -- Function to return the id of the "CICLO"
 DELIMITER $$
+CREATE FUNCTION GetCicloName(inputId integer)
+    RETURNS VARCHAR(100) READS SQL DATA
+    DETERMINISTIC
+    BEGIN
+        DECLARE ciclo_id INTEGER;
+        DECLARE return_value VARCHAR(100);
+        -- get the id from CICLO table
+        SELECT id_ciclo INTO ciclo_id FROM CICLO WHERE  id_ciclo = inputId ;
+
+        IF ciclo_id = 1 THEN
+            SET return_value = 'PRIMER SEMESTRE';
+        ELSEIF ciclo_id = 2 THEN
+            SET return_value = 'SEGUNDO SEMESTRE';
+        ELSEIF ciclo_id = 3 THEN
+            SET return_value = 'VACACIONES DE JUNIO';
+        ELSEIF ciclo_id = 4 THEN
+            SET return_value = 'VACACIONES DE DICIEMBRE';
+        END IF;
+
+        return return_value;
+    END ;
+    $$
+DELIMITER ;
+
+
+-- Function to return the id of the "CICLO"
+DELIMITER $$
 CREATE FUNCTION GetCiclo(inputName VARCHAR(2))
     RETURNS INTEGER READS SQL DATA
     DETERMINISTIC
@@ -377,7 +404,7 @@ BEGIN
     SET new_value = ROUND(inputNote);
 
     RETURN new_value;
-END;
+END
 $$
 DELIMITER ;
 
