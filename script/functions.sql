@@ -264,7 +264,7 @@ $$
 DELIMITER ;
 
 -- Function to validate if the student owns for tha carreer
-DROP FUNCTION proyecto2.IsSameCarrera;
+-- DROP FUNCTION proyecto2.IsSameCarrera;
 DELIMITER $$
 CREATE FUNCTION IsSameCarrera(inputCarnet BIGINT, input_curso_h INTEGER)
     RETURNS BOOLEAN READS SQL DATA
@@ -428,7 +428,7 @@ DELIMITER ;
 
 
 -- Function to validate if all the notes
-DROP FUNCTION proyecto2.AreNotasComplete;
+-- DROP FUNCTION proyecto2.AreNotasComplete;
 
 DELIMITER $$
 CREATE FUNCTION AreNotasComplete(input_curso_habilitado_id INTEGER)

@@ -56,7 +56,7 @@ DELIMITER ;
 
 
 -- 3.
-DROP PROCEDURE proyecto2.consultarDocente;
+-- DROP PROCEDURE proyecto2.consultarDocente;
 DELIMITER $$
 CREATE PROCEDURE consultarDocente(
     IN new_carnet BIGINT
@@ -85,7 +85,7 @@ CREATE PROCEDURE consultarDocente(
 DELIMITER ;
 
 -- 4.
-DROP PROCEDURE proyecto2.consultarAsignados;
+-- DROP PROCEDURE proyecto2.consultarAsignados;
 DELIMITER $$
 CREATE PROCEDURE consultarAsignados(
     IN new_codigo_curso INT,
@@ -136,7 +136,7 @@ CREATE PROCEDURE consultarAsignados(
 DELIMITER ;
 
 -- 5.
-DROP PROCEDURE proyecto2.consultarAprobacion;
+-- DROP PROCEDURE proyecto2.consultarAprobacion;
 DELIMITER $$
 CREATE PROCEDURE consultarAprobacion(
     IN new_codigo_curso INT,
@@ -189,7 +189,7 @@ CREATE PROCEDURE consultarAprobacion(
 DELIMITER ;
 
 -- 6.
-DROP PROCEDURE proyecto2.consultarActas;
+-- DROP PROCEDURE proyecto2.consultarActas;
 DELIMITER $$
 CREATE PROCEDURE consultarActas(
     IN new_codigo_curso INT
@@ -229,7 +229,7 @@ CREATE PROCEDURE consultarActas(
 DELIMITER ;
 
 -- 7.
-DROP PROCEDURE proyecto2.consultarDesasignacion;
+-- DROP PROCEDURE proyecto2.consultarDesasignacion;
 DELIMITER $$
 CREATE PROCEDURE consultarDesasignacion(
     IN new_codigo_curso INT,

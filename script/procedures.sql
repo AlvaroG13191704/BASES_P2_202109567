@@ -23,12 +23,13 @@ CREATE PROCEDURE crearCarrera(IN inputName VARCHAR(50))
 DELIMITER ;
 
 -- 2.
+-- DROP PROCEDURE proyecto2.registrarEstudiante;
 DELIMITER $$
 CREATE PROCEDURE registrarEstudiante(
     IN newCarnet BIGINT,
     IN newNames VARCHAR(50),
     IN newLastName VARCHAR(50),
-    IN newBirthDay DATE,
+    IN newBirthDay VARCHAR(11),
     IN newEmail VARCHAR(50),
     IN newPhone INTEGER,
     IN newAddress VARCHAR(50),
@@ -39,7 +40,9 @@ CREATE PROCEDURE registrarEstudiante(
         DECLARE is_email_valid BOOLEAN;
         DECLARE new_id_carrera INTEGER;
         DECLARE currentDate DATETIME;
+        DECLARE date_birth DATE;
 
+        SET date_birth = STR_TO_DATE(newBirthDay, '%d-%m-%Y');
 
         -- Evaluate if the email is valid
         SET is_email_valid = IsEmailValid(newEmail);
@@ -61,7 +64,7 @@ CREATE PROCEDURE registrarEstudiante(
                         newCarnet,
                         newNames,
                         newLastName,
-                        newBirthDay,
+                        date_birth,
                         newEmail,
                         newPhone,
                         newAddress,
@@ -76,11 +79,12 @@ CREATE PROCEDURE registrarEstudiante(
 DELIMITER ;
 
 -- 3.
+-- DROP PROCEDURE proyecto2.registrarDocente;
 DELIMITER $$
 CREATE PROCEDURE registrarDocente(
     IN newNames VARCHAR(50),
     IN newLastName VARCHAR(50),
-    IN newBirthDay DATE,
+    IN newBirthDay VARCHAR(11),
     IN newEmail VARCHAR(50),
     IN newPhone INTEGER,
     IN newAddress VARCHAR(50),
@@ -91,7 +95,9 @@ CREATE PROCEDURE registrarDocente(
         DECLARE is_email_valid BOOLEAN;
         DECLARE currentDate DATETIME;
         DECLARE is_new_docente BOOLEAN;
+        DECLARE date_value DATE;
         -- evaluate if the docente is already created
+        SET date_value = STR_TO_DATE(newBirthDay, '%d-%m-%Y');
         SET is_new_docente = IsNewDocente(newDpi);
         IF is_new_docente = TRUE THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El docente ya existe en la base de datos.';
@@ -111,7 +117,7 @@ CREATE PROCEDURE registrarDocente(
             INSERT INTO DOCENTE(
                 nombres, apellidos, fecha_nacimiento, correo, telefono, direccion, dpi, registro_siif, registro_creacion
                 )  VALUES(
-                newNames,newLastName,newBirthDay,newEmail,newPhone,newAddress,newDpi,newSIIF,currentDate
+                newNames,newLastName,date_value,newEmail,newPhone,newAddress,newDpi,newSIIF,currentDate
                 );
         END IF;
     END;
@@ -119,15 +125,15 @@ CREATE PROCEDURE registrarDocente(
 DELIMITER ;
 
 -- 4.
-DROP PROCEDURE proyecto2.crearCurso;
+-- DROP PROCEDURE proyecto2.crearCurso;
 DELIMITER $$
 CREATE PROCEDURE crearCurso(
     IN newCode INT,
     IN newName VARCHAR(50),
     IN newNecesarryCredits INTEGER,
     IN newGiveCredtis INTEGER,
-    IN newMandatory BOOLEAN,
-    IN newCarrera INTEGER
+    IN newCarrera INTEGER,
+    IN newMandatory BOOLEAN
 )
     BEGIN
         DECLARE positiveInteger1 BOOLEAN;
@@ -236,7 +242,7 @@ CREATE PROCEDURE agregarHorario(
 DELIMITER ;
 
 -- 7.
-DROP PROCEDURE proyecto2.asignarCurso;
+-- DROP PROCEDURE proyecto2.asignarCurso;
 DELIMITER $$
 CREATE PROCEDURE asignarCurso(
     IN new_id_curso INT,
@@ -291,7 +297,7 @@ CREATE PROCEDURE asignarCurso(
 DELIMITER ;
 
 -- 8.
-DROP PROCEDURE proyecto2.desasignarCurso;
+-- DROP PROCEDURE proyecto2.desasignarCurso;
 DELIMITER $$
 CREATE PROCEDURE desasignarCurso(
     IN new_id_curso INT,
@@ -333,7 +339,7 @@ CREATE PROCEDURE desasignarCurso(
 DELIMITER ;
 
 -- 9.
-DROP PROCEDURE proyecto2.ingresarNota;
+-- DROP PROCEDURE proyecto2.ingresarNota;
 DELIMITER $$
 CREATE PROCEDURE ingresarNota(
     IN new_id_curso INT,
@@ -400,7 +406,7 @@ DELIMITER ;
 
 
 -- 10.
-DROP PROCEDURE proyecto2.generarActa;
+-- DROP PROCEDURE proyecto2.generarActa;
 DELIMITER $$
 CREATE PROCEDURE generarActa(
     IN new_id_curso INT,
