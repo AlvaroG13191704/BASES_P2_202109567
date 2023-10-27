@@ -201,9 +201,9 @@ CREATE PROCEDURE habilitarCurso(
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'EL cupo máximo no es un entero positivo';
         ELSE
             -- insert
-            INSERT INTO CURSO_HABILITADO (cupo_maximo, cantidad_asignados, fecha, id_curso, id_docente, id_ciclo, id_seccion)
+            INSERT INTO CURSO_HABILITADO (cupo_maximo, fecha, id_curso, id_docente, id_ciclo, id_seccion)
                 VALUES (
-                newMaxCupo,0,dateCreation,curso_id,docente_id,ciclo_id,seccion_id
+                newMaxCupo,dateCreation,curso_id,docente_id,ciclo_id,seccion_id
                 );
         END IF;
     END;
